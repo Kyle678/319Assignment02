@@ -57,6 +57,7 @@ function App(){
 
     // sets page view to the shop
     const shopView = () => {
+        setQuery("");
         setViewer(0);
     }
 

@@ -350,13 +350,34 @@ function App() {
             setCart([]);
         }
 
+        const showCart = cart.map((el) => (
+            <Row key={el.id} className="mb-3">
+                <Col xs={12}>
+                    <div className="d-flex align-items-center">
+                        <div>
+                            <img src={el.image} alt={el.title} style={{ maxWidth: "100px", marginRight: "20px" }} />
+                        </div>
+                        <div className="ml-3" style={{ maxWidth: "40vh" }}>
+                            <h5>{el.title}</h5>
+                            <p>Quantity: {el.quantity}</p>
+                        </div>
+                    </div>
+                </Col>
+            </Row>
+        ));
+
         return (<div>
             <h1>Payment summary:</h1>
             <h3>{dataF.fullName}</h3>
             <p>{dataF.email}</p>
             <p>{dataF.creditCard}</p>
             <p>{dataF.address}</p>
-            <p>{dataF.city},{dataF.state} {dataF.zip}</p>
+            <p>{dataF.city}, {dataF.state} {dataF.zip}</p>
+
+            <br />
+            <h1>Order summary:</h1>
+            {showCart}
+            <p>Total: {numToPrice(subTotal * 1.075)}</p>
             <button onClick={updateHooks} className="btn btn-secondary">Submit</button>
         </div>)
     }

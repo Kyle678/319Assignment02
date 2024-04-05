@@ -8,46 +8,56 @@ import items from "./products.json";
 
 function App(){
 
+    // state used for form input at checkout
     const {register, handleSubmit, formState: {errors}} = useForm();
+
+    // state used for items in cart
     const [dataF,setDataF] = useState([]);
+
+    // state used to figure out what page to display
     const [viewer,setViewer] = useState(0);
+
+    // state to store the subtotal of the user's cart
     const [subTotal,setSubTotal] = useState(0);
 
+    // state used to control opacity of arrow on the shop page
     const [isVisible, setIsVisible] = useState(0);
 
+    // Tells page to listen to user scroll and dynamically changes
+    // isVisible's value for the arrow to use in its style
     useEffect(() => {
       const handleScroll = () => {
         const scrollPosition = window.scrollY;
-        // You can adjust the scroll threshold as needed
-        const scrollThreshold = 300; // Adjust this value according to your needs
+        const scrollThreshold = 300;
         setIsVisible((scrollThreshold - scrollPosition)/100);
       };
-  
-      // Attach the scroll event listener when the component mounts
       window.addEventListener('scroll', handleScroll);
-  
-      // Detach the scroll event listener when the component unmounts
       return () => {
         window.removeEventListener('scroll', handleScroll);
       };
     }, []);
 
+    // sets page view to the shop
     const shopView = () => {
         setViewer(0);
     }
 
+    // sets page view to the cart
     const cartView = () => {
         setViewer(1);
     }
 
+    // sets page view to the checkout
     const checkoutView = () => {
         setViewer(2);
     }
 
+    // converts decimal into a string representing its monetary value
     const numToPrice = (num) => {
         return "$"+num.toFixed(2);
     }
 
+    // returns the total cost of the items in the cart
     const totalCost = () => {
         let total = 0;
         for(let data of dataF) {
@@ -56,6 +66,8 @@ function App(){
         return total;
     }
 
+    // returns quantity of items for fixed "View Cart" button
+    // in the top right of the shop page
     const totalItemsInCart = () => {
         let total = 0;
         for(let item of dataF){
@@ -66,6 +78,7 @@ function App(){
 
     function Browse(){
 
+        // style for fixed "View Cart" button
         const buttonStyle = {
             position: 'fixed',
             top: '20px', 
@@ -73,6 +86,8 @@ function App(){
             zIndex: "999"
         };
 
+        // adds an item to the cart if it doesn't already exist
+        // if it does exist, increment its quantity by one
         const addToCart = (el) => {
             let alreadyInCart = 0;
             const updatedDataF = dataF.map(data => {
@@ -92,12 +107,15 @@ function App(){
             }
         }
 
+        // removes item from list if its quantity is one
+        // otherwise decrease quantity by one if it is in the cart
         const removeFromCart = (el) => {
             let hardCopy = [...dataF];
             hardCopy = hardCopy.filter((cartItem) => cartItem.id !== el.id || cartItem.quantity-- > 1);
             setDataF(hardCopy);
         }
 
+        // returns quantity of specified item in the cart
         const quantityInCart = (el) => {
             for(let item of dataF){
                 if(item.id === el.id){
@@ -107,6 +125,7 @@ function App(){
             return 0;
         }
 
+        // lists the elements from the json file
         const listItems = items.map((el) => (
             <Col key={el.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
                 <Card style={{ width: "15rem", height: "100%", backgroundColor:"#505050", color:"#000000" }}>
@@ -125,6 +144,8 @@ function App(){
             </Col>
         ));
 
+        // trigger an alert if there are no items in cart
+        // otherwise, continue to the cart page
         const cartOrAlert = () => {
             if(dataF.length === 0){
                 alert("Must add items to cart first.");
@@ -133,6 +154,9 @@ function App(){
             }
         }
 
+        // style for arrow
+        // dynamically changing visibility based on how far
+        // the user has scrolled down
         const arrowStyle = {
             opacity:isVisible,
             scale:"3"
@@ -163,6 +187,7 @@ function App(){
 
     function Cart(){
 
+        // Lists elements in user cart
         const listCart = dataF.map((el) => (
             <Row key={el.id} className="mb-3">
                 <Col xs={12}>
@@ -180,8 +205,11 @@ function App(){
             </Row>
         ));
 
+        // calculate total for order and set value
         setSubTotal(totalCost());
 
+        // style for order summary
+        // creates an outlined box in the top right with a fixed position
         const summaryBox = {
             position:"fixed",
             top: "100px",
@@ -296,6 +324,7 @@ function App(){
         );
     }
 
+    // overall style for entire page
     const pageStyle={
         backgroundColor: "#d0d0d0",
         minHeight: "120vh",

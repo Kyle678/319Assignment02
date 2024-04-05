@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useForm} from "react-hook-form";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -11,6 +11,26 @@ function App(){
     const {register, handleSubmit, formState: {errors}} = useForm();
     const [dataF,setDataF] = useState([]);
     const [viewer,setViewer] = useState(0);
+    const [subTotal,setSubTotal] = useState(0);
+
+    const [isVisible, setIsVisible] = useState(0);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        const scrollPosition = window.scrollY;
+        // You can adjust the scroll threshold as needed
+        const scrollThreshold = 300; // Adjust this value according to your needs
+        setIsVisible((scrollThreshold - scrollPosition)/100);
+      };
+  
+      // Attach the scroll event listener when the component mounts
+      window.addEventListener('scroll', handleScroll);
+  
+      // Detach the scroll event listener when the component unmounts
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }, []);
 
     const shopView = () => {
         setViewer(0);
@@ -32,6 +52,14 @@ function App(){
         let total = 0;
         for(let data of dataF) {
             total += data.price * data.quantity;
+        }
+        return total;
+    }
+
+    const totalItemsInCart = () => {
+        let total = 0;
+        for(let item of dataF){
+            total += item.quantity;
         }
         return total;
     }
@@ -70,17 +98,27 @@ function App(){
             setDataF(hardCopy);
         }
 
+        const quantityInCart = (el) => {
+            for(let item of dataF){
+                if(item.id === el.id){
+                    return item.quantity;
+                }
+            }
+            return 0;
+        }
+
         const listItems = items.map((el) => (
             <Col key={el.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
-                <Card style={{ width: "15rem", height: "100%" }}>
+                <Card style={{ width: "15rem", height: "100%", backgroundColor:"#505050", color:"#000000" }}>
                     <Card.Img className="card-img-top" src={el.image} alt="Card image cap" style={{ scale: "85%", minHeight: "250px", maxHeight:"250px", width: "auto", objectFit: "cover" }}/>            
                     <Card.Body className="d-flex flex-column card-content" style={{ height: "100%" }}>
                         <Card.Title className="card-title" style={{ height: "50%" }}>{el.title}</Card.Title>
                         <Card.Text className="card-text" style={{ height: "10%" }}>{el.category}</Card.Text>
                         <Card.Text className="card-text">{numToPrice(el.price)}</Card.Text>
+                        <Card.Text className="card-text">In Cart: {quantityInCart(el)}</Card.Text>
                         <div className="mt-auto">
-                            <Button onClick={() => removeFromCart(el)} variant="light">-</Button>
-                            <Button onClick={() => addToCart(el)} variant="light">+</Button>
+                            <button onClick={() => removeFromCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" class="btn btn-secondary btn-circle btn-sm">-</button> 
+                            <button onClick={() => addToCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" class="btn btn-secondary btn-circle btn-sm">+</button> 
                         </div>
                     </Card.Body>
                 </Card>
@@ -95,34 +133,30 @@ function App(){
             }
         }
 
+        const arrowStyle = {
+            opacity:isVisible,
+            scale:"3"
+        }
+
         return(
-            <div>
-                <Button variant="light" style={buttonStyle}>View Cart</Button>
+            <div style={{minHeight:"300vh"}}>
                 <div style={{ display: "inline", marginRight:"20px"}}>
                     <Button style={buttonStyle} onClick={() => cartOrAlert()} variant="light">
-                        <p style={{display:"inline", marginRight:"5px"}}>View Cart</p>
+                        <p style={{display:"inline", marginRight:"5px"}}>View Cart ({totalItemsInCart()})</p>
                         <i class="bi bi-cart"></i>
                     </Button>
                 </div>
-                <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height: "100vh"}}>
+                <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height: "80vh"}}>
                     <h1>Drew and Kyle's Shop</h1>
+                </div>
+                <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height: "20vh"}}>
+                    <i style={arrowStyle} class="bi bi-arrow-down"></i>
                 </div>
                 <Container>
                     <Row>
                         {listItems}
                     </Row>
                 </Container>
-                <Row className="justify-content-between">
-                    <Col style={{marginBottom:"50px"}}></Col>
-                    <Col xs="auto">
-                        <div style={{ display: "inline", marginRight:"20px"}}>
-                            <Button style={{marginRight:"40px"}} onClick={() => cartOrAlert()} variant="primary">
-                                <p style={{display:"inline", marginRight:"5px"}}>View Cart</p>
-                                <i class="bi bi-arrow-right-circle"></i>
-                            </Button>
-                        </div>
-                    </Col>
-                </Row>
             </div>
         );
     }
@@ -136,7 +170,7 @@ function App(){
                         <div>
                             <img src={el.image} alt={el.title} style={{ maxWidth: "100px", marginRight: "20px" }} />
                         </div>
-                        <div className="ml-3">
+                        <div className="ml-3" style={{maxWidth:"40vh"}}>
                             <h5>{el.title}</h5>
                             <p>Price: {numToPrice(el.price)} | Quantity: {el.quantity}</p>
                             <p>Total: {numToPrice(el.price * el.quantity)}</p>
@@ -146,8 +180,36 @@ function App(){
             </Row>
         ));
 
+        setSubTotal(totalCost());
+
+        const summaryBox = {
+            position:"fixed",
+            top: "100px",
+            right: "20px",
+            zIndex: "999",
+            whiteSpace: "pre",
+            paddingLeft: "5px",
+            paddingBottom: "5px",
+            border: "2px solid gray"
+        }
+
         return(
             <div>
+                <div style={summaryBox}>
+                    <div style={{display:"flex", justifyContent:"center", alignItems:"center"}}>
+                        <h3>Summary</h3>
+                    </div>
+                    <h5>Subtotal:    {numToPrice(subTotal)}</h5>
+                    <h5>Tax Rate:      7.5%</h5>
+                    <h5>Tax:            {numToPrice(subTotal * 0.075)}</h5>
+                    <h5>Total Cost: {numToPrice(subTotal * 1.075)}</h5>
+                    <div style={{ display: "inline", marginRight:"20px"}}>
+                        <Button onClick={() => checkoutView()} variant="light">
+                            <p style={{display:"inline", marginRight:"5px"}}>Proceed to Checkout</p>
+                            <i class="bi bi-arrow-right-circle"></i>
+                        </Button>
+                    </div>
+                </div>
                 <div style={{ display: "inline", marginLeft:"20px" }}>
                     <Button onClick={() => shopView()} variant="light">
                         <i class="bi bi-arrow-bar-left"></i>
@@ -160,19 +222,6 @@ function App(){
                         {listCart}
                     </Container>
                 </div>
-                <Row className="justify-content-between">
-                    <Col>
-                        <h5 style={{ marginLeft:"120px", marginTop:"20px", marginBottom:"20px"}}>Total Cost: {numToPrice(totalCost())}</h5>
-                    </Col>
-                    <Col xs="auto">
-                        <div style={{ display: "inline", marginRight:"20px"}}>
-                            <Button style={{marginRight:"40px"}} onClick={() => checkoutView()} variant="light">
-                                <p style={{display:"inline", marginRight:"5px"}}>Proceed to Checkout</p>
-                                <i class="bi bi-arrow-right-circle"></i>
-                            </Button>
-                        </div>
-                    </Col>
-                </Row>
             </div>
         );
     }
@@ -184,7 +233,7 @@ function App(){
         }
 
         return(
-            <div style={{marginTop:"20px"}}>
+            <div>
                 <div style={{ display: "inline", marginLeft:"20px" }}>
                     <Button onClick={() => cartView()} variant="light">
                         <i class="bi bi-arrow-bar-left"></i>

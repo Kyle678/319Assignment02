@@ -26,6 +26,12 @@ function App(){
     // state used to control opacity of arrow on the shop page
     const [isVisible, setIsVisible] = useState(1);
 
+    // state used for search bar
+    const [query, setQuery] = useState('');
+
+    // state used for filtered items
+    const [ProductsCategory, setProductsCategory] = useState(items);
+
     // Tells page to listen to user scroll and dynamically changes
     // isVisible's value for the arrow to use in its style
     useEffect(() => {
@@ -39,6 +45,15 @@ function App(){
         window.removeEventListener('scroll', handleScroll);
       };
     }, []);
+
+    const handleChange = (e) => {
+        setQuery(e.target.value);
+        const results = items.filter(eachProduct => {
+            if(e.target.value === "") return ProductsCategory;
+            return eachProduct.title.toLowerCase().includes(e.target.value.toLowerCase())
+        });
+        setProductsCategory(results);
+    }
 
     // sets page view to the shop
     const shopView = () => {
@@ -129,7 +144,7 @@ function App(){
         }
 
         // lists the elements from the json file
-        const listItems = items.map((el) => (
+        const listItems = ProductsCategory.map((el) => (
             <Col key={el.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
                 <Card style={{ width: "15rem", height: "100%", backgroundColor:"#505050", color:"#000000" }}>
                     <Card.Img className="card-img-top" src={el.image} alt="Card image cap" style={{ scale: "85%", minHeight: "250px", maxHeight:"250px", width: "auto", objectFit: "cover" }}/>            
@@ -332,12 +347,15 @@ function App(){
     // overall style for entire page
     const pageStyle={
         backgroundColor: "#d0d0d0",
-        minHeight: "120vh",
+        minHeight: "100vh",
         paddingTop: "20px"
     }
 
     return(
         <div style={pageStyle}>
+            {viewer === 0 && <div style={{marginLeft:"10px", position:"fixed", zIndex:"999"}} className="py-10">
+                <input type="search" value={query} onChange={handleChange} />
+            </div>}
             {viewer === 0 && <Browse />}
             {viewer === 1 && <Cart />}
             {viewer === 2 && <Checkout />}

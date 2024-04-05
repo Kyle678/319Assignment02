@@ -11,8 +11,11 @@ function App(){
     // state used for form input at checkout
     const {register, handleSubmit, formState: {errors}} = useForm();
 
+    // state used to store form
+    const [dataF,setDataF] = useState({});
+
     // state used for items in cart
-    const [dataF,setDataF] = useState([]);
+    const [cart,setCart] = useState([]);
 
     // state used to figure out what page to display
     const [viewer,setViewer] = useState(0);
@@ -60,7 +63,7 @@ function App(){
     // returns the total cost of the items in the cart
     const totalCost = () => {
         let total = 0;
-        for(let data of dataF) {
+        for(let data of cart) {
             total += data.price * data.quantity;
         }
         return total;
@@ -70,7 +73,7 @@ function App(){
     // in the top right of the shop page
     const totalItemsInCart = () => {
         let total = 0;
-        for(let item of dataF){
+        for(let item of cart){
             total += item.quantity;
         }
         return total;
@@ -90,7 +93,7 @@ function App(){
         // if it does exist, increment its quantity by one
         const addToCart = (el) => {
             let alreadyInCart = 0;
-            const updatedDataF = dataF.map(data => {
+            const updatedcart = cart.map(data => {
                 if(data.id === el.id){
                     alreadyInCart = 1;
                     return {...data, quantity: data.quantity+1}
@@ -100,24 +103,24 @@ function App(){
             });
 
             if(alreadyInCart){
-                setDataF(updatedDataF);
+                setCart(updatedcart);
             }else{
                 el.quantity = 1;
-                setDataF([...updatedDataF, el])
+                setCart([...updatedcart, el])
             }
         }
 
         // removes item from list if its quantity is one
         // otherwise decrease quantity by one if it is in the cart
         const removeFromCart = (el) => {
-            let hardCopy = [...dataF];
+            let hardCopy = [...cart];
             hardCopy = hardCopy.filter((cartItem) => cartItem.id !== el.id || cartItem.quantity-- > 1);
-            setDataF(hardCopy);
+            setCart(hardCopy);
         }
 
         // returns quantity of specified item in the cart
         const quantityInCart = (el) => {
-            for(let item of dataF){
+            for(let item of cart){
                 if(item.id === el.id){
                     return item.quantity;
                 }
@@ -147,7 +150,7 @@ function App(){
         // trigger an alert if there are no items in cart
         // otherwise, continue to the cart page
         const cartOrAlert = () => {
-            if(dataF.length === 0){
+            if(cart.length === 0){
                 alert("Must add items to cart first.");
             }else{
                 // calculate total for order and set value
@@ -190,7 +193,7 @@ function App(){
     function Cart(){
 
         // Lists elements in user cart
-        const listCart = dataF.map((el) => (
+        const listCart = cart.map((el) => (
             <Row key={el.id} className="mb-3">
                 <Col xs={12}>
                     <div className="d-flex align-items-center">

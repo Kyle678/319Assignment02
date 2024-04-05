@@ -377,6 +377,8 @@ function App() {
             <br />
             <h1>Order summary:</h1>
             {showCart}
+            <p>SubTotal: {numToPrice(subTotal)}</p>
+            <p>Tax: {numToPrice(subTotal * 0.075)}</p>
             <p>Total: {numToPrice(subTotal * 1.075)}</p>
             <button onClick={updateHooks} className="btn btn-secondary">Submit</button>
         </div>)

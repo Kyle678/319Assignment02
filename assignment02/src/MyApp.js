@@ -382,7 +382,7 @@ function App() {
             </Row>
         ));
 
-        return (<div>
+        return (<div style={{marginLeft:"20px"}}>
             <h1>Payment summary:</h1>
             <h3>{dataF.fullName}</h3>
             <p>{dataF.email}</p>

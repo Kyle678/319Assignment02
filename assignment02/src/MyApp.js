@@ -382,7 +382,15 @@ function App() {
             </Row>
         ));
 
-        return (<div style={{marginLeft:"20px"}}>
+        return (
+            <div>
+            <div style={{ display: "inline", marginLeft: "20px" }}>
+                <Button onClick={() => cartView()} variant="light">
+                    <i className="bi bi-arrow-bar-left"></i>
+                    <p style={{ display: "inline" }}>Back</p>
+                </Button>
+            </div>
+            <div style={{marginLeft:"20px"}}>
             <h1>Payment summary:</h1>
             <h3>{dataF.fullName}</h3>
             <p>{dataF.email}</p>
@@ -397,7 +405,9 @@ function App() {
             <p>Tax: {numToPrice(subTotal * 0.075)}</p>
             <p>Total: {numToPrice(subTotal * 1.075)}</p>
             <button onClick={updateHooks} className="btn btn-secondary">Submit</button>
-        </div>)
+            </div>
+            </div>
+        );
     }
 
     // overall style for entire page

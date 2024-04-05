@@ -21,7 +21,7 @@ function App(){
     const [subTotal,setSubTotal] = useState(0);
 
     // state used to control opacity of arrow on the shop page
-    const [isVisible, setIsVisible] = useState(0);
+    const [isVisible, setIsVisible] = useState(1);
 
     // Tells page to listen to user scroll and dynamically changes
     // isVisible's value for the arrow to use in its style
@@ -136,8 +136,8 @@ function App(){
                         <Card.Text className="card-text">{numToPrice(el.price)}</Card.Text>
                         <Card.Text className="card-text">In Cart: {quantityInCart(el)}</Card.Text>
                         <div className="mt-auto">
-                            <button onClick={() => removeFromCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" class="btn btn-secondary btn-circle btn-sm">-</button> 
-                            <button onClick={() => addToCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" class="btn btn-secondary btn-circle btn-sm">+</button> 
+                            <button onClick={() => removeFromCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" className="btn btn-secondary btn-circle btn-sm">-</button> 
+                            <button onClick={() => addToCart(el)} style={{minWidth:"40px", borderRadius:"20px"}} type="button" className="btn btn-secondary btn-circle btn-sm">+</button> 
                         </div>
                     </Card.Body>
                 </Card>
@@ -150,6 +150,8 @@ function App(){
             if(dataF.length === 0){
                 alert("Must add items to cart first.");
             }else{
+                // calculate total for order and set value
+                setSubTotal(totalCost());
                 cartView();
             }
         }
@@ -167,14 +169,14 @@ function App(){
                 <div style={{ display: "inline", marginRight:"20px"}}>
                     <Button style={buttonStyle} onClick={() => cartOrAlert()} variant="light">
                         <p style={{display:"inline", marginRight:"5px"}}>View Cart ({totalItemsInCart()})</p>
-                        <i class="bi bi-cart"></i>
+                        <i className="bi bi-cart"></i>
                     </Button>
                 </div>
                 <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height: "80vh"}}>
                     <h1>Drew and Kyle's Shop</h1>
                 </div>
                 <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height: "20vh"}}>
-                    <i style={arrowStyle} class="bi bi-arrow-down"></i>
+                    <i style={arrowStyle} className="bi bi-arrow-down"></i>
                 </div>
                 <Container>
                     <Row>
@@ -205,9 +207,6 @@ function App(){
             </Row>
         ));
 
-        // calculate total for order and set value
-        setSubTotal(totalCost());
-
         // style for order summary
         // creates an outlined box in the top right with a fixed position
         const summaryBox = {
@@ -234,13 +233,13 @@ function App(){
                     <div style={{ display: "inline", marginRight:"20px"}}>
                         <Button onClick={() => checkoutView()} variant="light">
                             <p style={{display:"inline", marginRight:"5px"}}>Proceed to Checkout</p>
-                            <i class="bi bi-arrow-right-circle"></i>
+                            <i className="bi bi-arrow-right-circle"></i>
                         </Button>
                     </div>
                 </div>
                 <div style={{ display: "inline", marginLeft:"20px" }}>
                     <Button onClick={() => shopView()} variant="light">
-                        <i class="bi bi-arrow-bar-left"></i>
+                        <i className="bi bi-arrow-bar-left"></i>
                         <p style={{ display:"inline" }}>Back</p>
                     </Button>
                 </div>
@@ -257,14 +256,17 @@ function App(){
     function Checkout(){
 
         const onSubmit = data => {
-            console.log("Data submitting");
+            console.log("Data submitted: ");
+            console.log(data);
+
+            setDataF(data);
         }
 
         return(
             <div>
                 <div style={{ display: "inline", marginLeft:"20px" }}>
                     <Button onClick={() => cartView()} variant="light">
-                        <i class="bi bi-arrow-bar-left"></i>
+                        <i className="bi bi-arrow-bar-left"></i>
                         <p style={{ display:"inline" }}>Back</p>
                     </Button>
                 </div>
@@ -303,16 +305,16 @@ function App(){
                         </div>
                         <div>
                             <p>
-                                Subtotal: {numToPrice(totalCost())}
+                                Subtotal: {numToPrice(subTotal)}
                             </p>
                             <p>
                                 Tax Rate: 7.5%
                             </p>
                             <p>
-                                Tax: {numToPrice(totalCost() * 0.075)}
+                                Tax: {numToPrice(subTotal * 0.075)}
                             </p>
                             <p>
-                                Total Cost: {numToPrice(totalCost() * 1.075)}
+                                Total Cost: {numToPrice(subTotal * 1.075)}
                             </p>
                         </div>
                         <div className="form-group" style={{marginTop:"10px"}}>

@@ -355,7 +355,7 @@ function App(){
     return(
         <div style={pageStyle}>
             {viewer === 0 && <div style={{marginLeft:"10px", position:"fixed", zIndex:"999"}} className="py-10">
-                <input type="search" value={query} onChange={handleChange} />
+                <input type="search" value={query} onChange={handleChange} placeholder="Search..." />
             </div>}
             {viewer === 0 && <Browse />}
             {viewer === 1 && <Cart />}

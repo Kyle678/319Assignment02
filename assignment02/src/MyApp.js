@@ -234,7 +234,7 @@ function App(){
                     <h5>Tax:            {numToPrice(subTotal * 0.075)}</h5>
                     <h5>Total Cost: {numToPrice(subTotal * 1.075)}</h5>
                     <div style={{ display: "inline", marginRight:"20px"}}>
-                        <Button onClick={() => checkoutView()} variant="light">
+                        <Button onClick={() => checkoutView()} variant="primary">
                             <p style={{display:"inline", marginRight:"5px"}}>Proceed to Checkout</p>
                             <i className="bi bi-arrow-right-circle"></i>
                         </Button>
